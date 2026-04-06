@@ -2,6 +2,7 @@
 
 A Linux C program that monitors a log file in real time using POSIX signals and process forking. The parent process forks a child to watch `logfile.log` — when the child detects `INFO`, `WARNING`, or `ERROR` entries, it signals the parent via `SIGUSR1` and a pipe, which then spawns numbered Task processes and prints appropriate output.
 
+
 ## Features
 
 - **Parent/child architecture** — parent sets up signal handlers and forks a monitor child
@@ -66,32 +67,9 @@ Task 4 started (PID: 3732)
 Task 5 started (PID: 3733)
 ```
 
-## How It Works
-
+## Reason
 ```
-main()
- ├─ install SIGUSR1 / SIGINT handlers
- ├─ create pipe (child writes, parent reads)
- ├─ fork → child_monitor()
- │    ├─ open logfile.log
- │    ├─ process existing lines
- │    └─ inotify loop: on IN_MODIFY → process_lines()
- │         └─ per line: classify level → write 'I'/'W'/'E' to pipe → kill(parent, SIGUSR1)
- └─ parent event loop
-      ├─ SIGUSR1 wakes parent
-      ├─ drain pipe (non-blocking read)
-      │    ├─ 'E' → print_exception()
-      │    ├─ 'W' → print_warning()
-      │    └─ 'I'/'W'/'E' → fork Task N → print_task()
-      └─ SIGINT → SIGTERM child → SIGKILL child → exit
-```
-
-## File Structure
-
-```
-.
-├── monitor.c     # full source
-└── logfile.log   # input log file (must be in current directory)
+It is a small learning experience for me on how I get to use terminal on Linux and how signals worked in C.
 ```
 
 ## Author
